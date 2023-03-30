@@ -1,0 +1,131 @@
+
+<div class="page" style="background: #EDF1D6; display: flex; flex-direction: column; min-height: calc(100vh - 150px);">
+<div class="px-4 py-5 my-0 text-center" style="background-image: linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.4)), url(https://images.unsplash.com/photo-1516528387618-afa90b13e000?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80)">
+  <h1 class="display-5 fw-bold" style="color: white"><i class="fa-sharp fa-solid fa-house-user"></i> Bienvenue dans votre dashboard <%= current_user.first_name %> ! </h1>
+  <div class="col-lg-6 mx-auto">
+      <p class="lead mb-4" style="color: #EDF1D6">Gérez vos cabanes, vos réservations et les réservations de vos clients</p>
+  </div>
+</div>
+
+  <div class="row justify-content-center p-2" style="background: #EDF1D6;">
+
+
+      <h3 class="text-center mt-2">Espace Locataire</h3>
+    <div class="col-8 m-2 p-3" style="background: #EDF1D6; border-radius: 5px; box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;">
+      <h6 class="text-start pb-3" style="color : #40513B"><strong>Mes demandes de réservation (<%= @bookings_as_r.count %>)</strong></h6>
+      <% @bookings_as_r.each do |booking| %>
+        <div class="card-product m-2" style="border-radius: 5px;  background: #EDF1D6">
+          <%= link_to caban_path(booking.caban) do %>
+            <% if booking.caban.photos.attached?%>
+              <%= cl_image_tag booking.caban.photos.first.key %>
+            <% end %>
+          <% end %>
+            <div class="card-product-infos" style="height: fit-content">
+              <h2><%= booking.caban.name%></h2>
+              <p><i class="fa-sharp fa-solid fa-calendar-days"></i> Du <%= booking.start_date.strftime('%d/%m/%Y') %> au <%= booking.end_date.strftime('%d/%m/%Y') %></p>
+              <p> Total de la réservation : <strong><%= ((booking.end_date - booking.start_date).to_i) * booking.caban.price %> €</strong></p>
+              <% if booking.status == "declined" %>
+                <p class="btn btn-danger"><%= booking.status %></p>
+              <% elsif booking.status == "accepted" %>
+                <p class="btn btn-success"><%= booking.status %></p>
+              <% else %>
+                <p class="btn btn-warning"><%= booking.status %></p>
+              <% end %>
+            </div>
+        </div>
+        <% end %>
+    </div>
+      <h3 class="text-center mt-2">Espace Propriétaire</h3>
+    <div class="col-4 m-2 p-3" style="background: #EDF1D6; border-radius: 5px; box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;">
+
+      <div class="d-flex justify-content-between">
+        <div class="title">
+          <h6 class="text-start" style="color : #40513B"><strong> Mes demandes de réservation (<%= @bookings_as_p.count %>)</strong></h6>
+        </div>
+        <div class="dropdown mb-1">
+          <button class="btn btn-secondary btn-sm dropdown-toggle" style="background: #40513B; color: #EDF1D6" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" data-action="dropdown#toggle click@window->dropdown#hide" aria-expanded="false"><i class="fa-solid fa-filter"></i>
+            Statuts
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenu2" data-dropdown-target="menu"
+            class="hidden transition transform origin-top-right absolute right-0"
+            data-transition-enter-from="opacity-0 scale-95"
+            data-transition-enter-to="opacity-100 scale-100"
+            data-transition-leave-from="opacity-100 scale-100"
+            data-transition-leave-to="opacity-0 scale-95">
+
+            <li><%= link_to "Toutes", dashboard_path, class: "dropdown-item text-decoration-none text-dark" %></li>
+            <li><%= link_to "Pending", dashboard_path(status: "pending"), class: "dropdown-item text-decoration-none text-dark" %></li>
+            <li><%= link_to "Accepted", dashboard_path(status: "accepted"), class: "dropdown-item text-decoration-none text-dark" %></li>
+            <li><%= link_to "Refused", dashboard_path(status: "declined"), class: "dropdown-item text-decoration-none text-dark" %></li>
+          </ul>
+        </div>
+      </div>
+
+      <% @bookings_as_p.each do |booking| %>
+      <div class="card-product m-2" style="border-radius: 5px; background: #EDF1D6">
+        <% if booking.caban.photos.attached?%>
+          <%= cl_image_tag booking.caban.photos.first.key %>
+        <% end %>
+        <div class="card-product-infos" style="height: fit-content">
+          <h2 ><%= booking.caban.name%></h2>
+            <p><i class="fa-sharp fa-solid fa-calendar-days"></i> Du <%= booking.start_date.strftime('%d/%m/%Y') %> au <%= booking.end_date.strftime('%d/%m/%Y') %></p>
+            <p> Total de la réservation : <strong><%= ((booking.end_date - booking.start_date).to_i) * booking.caban.price %> €</strong></p>
+            <% if booking.status == "declined" %>
+              <p class="btn btn-danger"><%= booking.status %></p>
+            <% elsif booking.status == "accepted" %>
+              <p class="btn btn-success"><%= booking.status %></p>
+            <% else %>
+              <p class="btn btn-warning"><%= booking.status %></p>
+            <% end %>
+        </div>
+          <div class="d-flex flex-column pt-2 pb-2">
+            <%= link_to accept_booking_path(booking), class: "text-decoration-none text-success" do %>
+              <i class="fa-sharp fa-solid fa-square-check text-success"></i>
+            <% end %>
+            <%= link_to refuse_booking_path(booking), class: "text-decoration-none text-danger" do %>
+              <i class="fa-solid fa-ban text-danger"></i>
+            <% end %>
+          </div>
+      </div>
+      <% end %>
+    </div>
+
+    <div class="col-4 m-2 p-3" style="background: #EDF1D6; border-radius: 5px; box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;">
+        <h6 class="text-start pb-3" style="color : #40513B"><strong>Liste de mes cabanes</strong></h6>
+
+          <% @cabans_as_p.each do |caban| %>
+              <div class="card-product m-2" style="border-radius: 5px; background: #EDF1D6;">
+                <% if caban.photos.attached?%>
+                  <%= cl_image_tag caban.photos.first.key %>
+                <% end %>
+                <div class="card-product-infos" style="height: fit-content">
+                    <h2><%=caban.name %></h2>
+                    <p><%= caban.price %>€</p>
+                    <p class="fw-normal fst-italic"><i class="fa-solid fa-location-dot"></i> <%= caban.address %></p>
+                </div>
+                <div class="d-flex flex-column">
+                  <%= link_to caban_path(caban), data: {turbo_method: :delete, turbo_confirm: "Are you sure?"}, class:"text-decoration-none text-dark" do %>
+                    <i class="fa-solid fa-trash-can m-2 text-dark"></i>
+
+                  <% end %>
+                  <%= link_to edit_caban_path(caban), class:"text-decoration-none text-dark" do %>
+                    <i class="fa-solid fa-pen-to-square m-2 text-dark"></i>
+
+                  <% end %>
+                </div>
+              </div>
+          <% end %>
+          <div class="d-flex justify-content-end">
+            <%= link_to new_caban_path do %>
+              <i class="fa-solid fa-plus"></i>
+              Ajouter une cabane
+            <% end %>
+          </div>
+    </div>
+
+  </div>
+
+  <div>
+
+  </div>
+</div>
